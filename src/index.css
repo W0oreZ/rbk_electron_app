@@ -1,13 +1,122 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+body {
+    width: 100vw;
+    height: 100vh;
+    background-color: black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.container {
+    width: 90vw;
+    height: 480px;
+    background-color: #f4f4f4;
+
+}
+
+.screen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.side {
+    width: 230px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 10px;
+}
+
+.side h1 {
+    color: #a2a2a2;
+    font-size: 3rem;
+    padding-bottom: 1.2em;
+}
+
+.side p {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+
+
+.params {
+    flex-grow: 1;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    border-left: #a2a2a2 solid;
+}
+
+.card {
+    width: 50%;
+    height: 50%;
+    border-bottom: #a2a2a2 solid;
+    border-right: #a2a2a2 solid;
+    padding: 2em;
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    flex-direction: column;
+}
+
+.card-title {
+    font-size: 2.5rem;
+    color: #a2a2a2;
+}
+
+.card-content {
+    flex-grow: 1;
+    font-size: 2rem;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.card-footer {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.btn {
+    border:none; 
+    border-radius:5px; 
+    padding:10px;
+    min-height:30px; 
+    min-width: 120px;
+
+}
+
+.btn-primary {
+    background-color:#0a0a23;
+    color: #fff;
+}
+
+.btn-secondary {
+    color:#0a0a23;
+    border: #0a0a23 solid;
+    background-color: #fff;
+}
+
+.status-footer {
+    width: 100%;
+    height: 80%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
