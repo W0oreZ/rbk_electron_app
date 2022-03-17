@@ -117,8 +117,6 @@ async function main() {
     04
 */
 
-//timer convert
-
 function time_convert(data)
 {
     //check digit in number 
