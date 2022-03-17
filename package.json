@@ -19,6 +19,7 @@
     "cross-env": "^7.0.2",
     "electron-browser-storage": "^1.0.7",
     "electron-is-dev": "^1.2.0",
+    "mqtt": "^4.3.7",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-router-dom": "^5.2.0",
