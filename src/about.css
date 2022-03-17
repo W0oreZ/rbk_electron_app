@@ -121,83 +121,10 @@ body {
     align-items: center;
 } */
 
-body {
-    font-family: "Aileron",sans-serif;
-        
-        font-weight: bold;
 
+#AboutScreen {
+    background-image: url('./images/List.png');
+    background-repeat: no-repeat;
+    width: 100vw;
+    height: 100vh;
 }
-#dashboard {
-    background-image: url('./images/Dashboard.png');
-     background-repeat: no-repeat;
-     width: 100vw;
-     height: 100vh;
-}
- #numberTemp 
-   {
-     position: absolute;
-     left : 669px ;
-     top : 104px;
-     font-size: 47px; 
-   }
-   #upTime 
-   {
-     position: absolute;
-     left : 45px ;
-     top : 38px;
-     font-size: 17px;
-      
-   }
-   #numberCycleTime 
-   {
-     position: absolute;
-     left : 710px ;
-     top : 247px;
-     font-size: 47px; 
-   }
-   #numberCycleCount 
-   {
-     position: absolute;
-     left : 729px ;
-     top : 394px;
-     font-size: 47px; 
-   }
-   #datetime
-   {
-     font-weight: normal;
-     position: absolute;
-     left : 380px ;
-     top : 523px;
-     font-size: 25px; 
-     color : white;
-   }
-   #fullname 
-   {
-     position: absolute;
-     left : 87px ;
-     top : 531px;
-     font-size: 15px; 
-   }
-   #Opstart 
-   {
-     position: absolute;
-     left : 209.76px ;
-     top : 275.96px;
-     font-size: 22px; 
-     color : white ;
-   }
-   #param  
-   {
-     background-color: transparent;
-     background-repeat: no-repeat;
-     border: none;
-     cursor: pointer;
-     overflow: hidden;
-     outline: none;
-     position: absolute;
-     left : 969.37px ;
-     top : 25.14px;
-     width:50px;
-     height:50px;
-     cursor: pointer;
-   }

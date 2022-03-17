@@ -78,10 +78,11 @@ async function main() {
         sendDeviceMessage({temperature:config.temperature, countdown:config.countdown});
         setInterval(()=>{
             mqtt_publish("devices/rbk/events", JSON.stringify({
-                temperature: config.temperature,
-                countdown: config.countdown,
+                type:"CONFIG",
+                temp: config.temperature,
+                countDown: config.countdown,
                 count: config.count,
-                uptime: getTimer()
+                upTime: getTimer()
             }))
         }, 5000)
     }
@@ -205,14 +206,14 @@ async function handleDeviceMessage(bytes) {
         MainWindow.webContents.send('device-status', config);
         mqtt_publish("devices/rbk/events", JSON.stringify({
             type: "STATUS",
-            payload: "OP START"
+            msg: "OP START"
         }))
         resumeTimer();
         setTimeout(()=>{
             console.log("OP DONE");
             mqtt_publish("devices/rbk/events", JSON.stringify({
                 type: "STATUS",
-                payload: "OP DONE"
+                msg: "OP DONE"
             }))
 
             config.status = "OP DONE";
@@ -235,7 +236,7 @@ async function handleDeviceMessage(bytes) {
         MainWindow.webContents.send("device-status", {'status': 'OP SHUTDOWN'});
         mqtt_publish("devices/rbk/events", JSON.stringify({
             type: "STATUS",
-            payload: "OP SHUTDOWN"
+            msg: "OP SHUTDOWN"
         }));
         pauseTimer();
     }
@@ -271,7 +272,26 @@ async function sendDeviceMessage(data) {
     }
 }
 
-ipcMain.on("send-command", sendDeviceMessage);
+async function handleDeviceCMD(evt, payload) {
+    console.log("Received : ", payload)
+    // {type:"raz-count / raz-uptime",payload:}
+    // {type:"config", paylod:{temp:500,countDown:10}}
+    if(payload.type === "config") {
+        config.countdown = payload.payload.countDown;
+        config.temperature = payload.payload.temp
+        var dd = {temperature: payload.payload.temp, countdown: payload.payload.countDown};
+        sendDeviceMessage(dd)
+        saveConfig(config)
+    }else if( payload.type === "raz-count" ) {
+        config.count = 0;
+        saveConfig(config)
+    }else if ( payload.type === "raz-uptime" ) {
+        resetTimer();
+    }
+
+}
+
+ipcMain.on("send-command", handleDeviceCMD);
 
 ipcMain.handle('get-time', () => {
     return getTimer();

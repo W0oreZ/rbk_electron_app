@@ -1,0 +1,49 @@
+
+#MenuScreen {
+    background-image: url('./images/Configuration.png');
+    background-repeat: no-repeat;
+    width: 100vw;
+    height: 100vh;
+}
+#configuration 
+{
+  background-color: transparent;
+  background-repeat: no-repeat;
+  border: none;
+  cursor: pointer;
+  overflow: hidden;
+  outline: none;
+  position: absolute;
+  left : 569px ;
+  top : 190px;
+  width:300px;
+  height:300px;
+}
+#info 
+{
+  background-color: transparent;
+  background-repeat: no-repeat;
+  border: none;
+  cursor: pointer;
+  overflow: hidden;
+  outline: none;
+  position: absolute;
+  left : 170px ;
+  top : 190px;
+  width:300px;
+  height:300px;
+}
+#return  
+{
+  background-color: transparent;
+  background-repeat: no-repeat;
+  border: none;
+  cursor: pointer;
+  overflow: hidden;
+  outline: none;
+  position: absolute;
+  left : 32px ;
+  top : 31px;
+  width:60px;
+  height:60px;
+}
