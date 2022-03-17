@@ -103,6 +103,48 @@ async function main() {
 
     04
 */
+
+//timer convert
+
+function time_convert(data)
+{
+    //check digit in number 
+    const numberAfterDecimal = parseInt((data % 1).toFixed(2).substring(2));
+    console.log(numberAfterDecimal)
+    const numberBeforeDecimal = parseInt(data);
+    console.log(numberBeforeDecimal)
+
+    if (numberBeforeDecimal.toString().length == 1)
+    {   new_data = "0" + data + "." + numberAfterDecimal.toString()
+        return new_data
+    }
+    else if (numberBeforeDecimal.toString().length == 2)
+    {
+        new_data = data + "." + numberAfterDecimal.toString()
+        return  new_data
+    }
+
+}
+//temperature convert
+function temperature_convert(data)
+{
+        //check digit in number 
+        const number_of_digit = data.toString().length;
+        if (number_of_digit == 1)
+        {
+            return "00" + data.toString()
+        }
+        else if (number_of_digit == 2)
+        {
+            return "0" + data.toString()
+
+        }
+        else if (number_of_digit == 3)
+        {
+            return data.toString()
+
+        }
+}
 async function handleDeviceMessage(bytes) {
     
     console.log("Rx : ",bytes);
@@ -125,7 +167,7 @@ async function handleDeviceMessage(bytes) {
 async function sendDeviceMessage(data) {
     var buff = Buffer.alloc(14);
     buff[0] = 0x01;
-    buff.write(timer_convert(data),1);
+    buff.write(time_convert(data),1);
     buff[6] = 0x01;
     buff[7] = 0x5F;
     buff.write(temperature_convert(data), 8);
