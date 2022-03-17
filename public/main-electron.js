@@ -51,9 +51,9 @@ async function main() {
         }
     });
 
-    MainWindow.loadURL(
-        isDev?"http://localhost:3000":`file://${path.join(__dirname, "../build/index.html")}`
-    );
+    // MainWindow.loadURL(
+    //     isDev?"http://localhost:3000":`file://${path.join(__dirname, "../build/index.html")}`
+    // );
 
     MainWindow.on('ready-to-show', async () => {
         if(device_port){
@@ -70,7 +70,7 @@ async function main() {
         }
     })
 
-    //MainWindow.loadURL(`file://${path.join(__dirname, "../build/index.html")}`);
+    MainWindow.loadURL(`file://${path.join(__dirname, "../build/index.html")}`);
 }
 
 // In this file you can include the rest of your app's specific main process
