@@ -125,10 +125,10 @@ async function handleDeviceMessage(bytes) {
 async function sendDeviceMessage(data) {
     var buff = Buffer.alloc(14);
     buff[0] = 0x01;
-    buff.write("09.5",1);
+    buff.write(timer_convert(data),1);
     buff[6] = 0x01;
     buff[7] = 0x5F;
-    buff.write("499", 8);
+    buff.write(temperature_convert(data), 8);
 
     var checksum = 0;
     for (let index = 0; index < 11; index++) {
@@ -152,6 +152,45 @@ async function sendDeviceMessage(data) {
     }
 }
 
+function timer_convert(data)
+{
+    //check digit in number 
+    const numberAfterDecimal = parseInt((data % 1).toFixed(2).substring(2));
+    console.log(numberAfterDecimal)
+    const numberBeforeDecimal = parseInt(data);
+    console.log(numberBeforeDecimal)
+
+    if (numberBeforeDecimal.toString().length == 1)
+    {   new_data = "0" + data + "." + numberAfterDecimal.toString()
+        return new_data
+    }
+    else if (numberBeforeDecimal.toString().length == 2)
+    {
+        new_data = data + "." + numberAfterDecimal.toString()
+        return  new_data
+    }
+
+}
+
+function temperature_convert(data)
+{
+        //check digit in number 
+        const number_of_digit = data.toString().length;
+        if (number_of_digit == 1)
+        {
+            return "00" + data.toString()
+        }
+        else if (number_of_digit == 2)
+        {
+            return "0" + data.toString()
+
+        }
+        else if (number_of_digit == 3)
+        {
+            return data.toString()
+
+        }
+}
 ipcMain.on("send-command", sendDeviceMessage);
 
 ipcMain.handle('get-time', () => {
