@@ -6,8 +6,8 @@ const MainView = () => {
     const [runTime, setRunTime] = useState();
     const [timer, setTimer] = useState(null);
     useEffect(()=> {
-        setTimer(setInterval(()=>{
-            setRunTime(window.rbk.getRunTime());
+        setTimer(setInterval(async ()=>{
+            setRunTime(await window.rbk.getRunTime());
         },1000));
 
         window.rbk.onDeviceStatusChange((data)=>{

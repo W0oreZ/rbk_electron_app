@@ -1,17 +1,27 @@
-const { app, BrowserWindow, ipcMain } = require('electron')
+const { app, BrowserWindow, ipcMain, dialog } = require('electron')
 const path = require('path')
 const isDev = require('electron-is-dev')
 
-const { getDevicePort } = require('./port-utils.js')
+const { getDevicePort } = require('./port-utils.js');
+const { startTimer, getTimer } = require('./timer.js');
+const { loadConfig } = require('./config.js');
 let device_port = null;
 let MainWindow;
 
-app.whenReady().then(main);
+app.disableHardwareAcceleration();
+app.whenReady().then(() => {
+    loadConfig();
+    startTimer();
+    main();
+});
+
+
 
 app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') {
-        app.quit()
-    }
+    // if (process.platform !== 'darwin') {
+    //     app.quit()
+    // }
+    main();
 })
   
 app.on('activate', () => {
@@ -22,14 +32,17 @@ app.on('activate', () => {
 
 async function main() {
     device_port = await getDevicePort();
-    device_port.on('data', handleDeviceMessage);
-
-
+    if(device_port) {
+        device_port.on('data', handleDeviceMessage);
+    }
+    
     MainWindow = new BrowserWindow({
+        show: false,
         autoHideMenuBar: true,
         minimizable: false,
         maximizable: true,
-        closable: false,
+        closable: true,
+        kiosk: true,
         width: 1024,
         height: 600,
         webPreferences: {
@@ -41,6 +54,23 @@ async function main() {
     MainWindow.loadURL(
         isDev?"http://localhost:3000":`file://${path.join(__dirname, "../build/index.html")}`
     );
+
+    MainWindow.on('ready-to-show', async () => {
+        if(!device_port){
+            MainWindow.show()
+        } else {
+            const response = await dialog.showMessageBox(MainWindow, {
+                title: 'DEVICE NOT FOUND',
+                buttons: ['retry'],
+                type: 'error',
+                message: 'Device was not detected.',
+            });
+            MainWindow.close();
+
+        }
+    })
+
+    //MainWindow.loadURL(`file://${path.join(__dirname, "../build/index.html")}`);
 }
 
 // In this file you can include the rest of your app's specific main process
@@ -123,3 +153,7 @@ async function sendDeviceMessage(data) {
 }
 
 ipcMain.on("send-command", sendDeviceMessage);
+
+ipcMain.handle('get-time', () => {
+    return getTimer();
+})

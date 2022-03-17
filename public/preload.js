@@ -1,5 +1,6 @@
 const { contextBridge, ipcRenderer } = require('electron')
 const os = require('os');
+const { getTimer } = require('./timer');
 
 const RBK_API = {
 
@@ -7,8 +8,10 @@ const RBK_API = {
         return os.platform();
     },
 
-    getRunTime: () => {
-        return new Date(Math.floor(process.uptime()) * 1000).toISOString().substr(11, 8);
+    getRunTime: async () => {
+        const time = await ipcRenderer.invoke('get-time');
+        return new Date(Math.floor(time) * 1000).toISOString().substr(11, 8);
+        //return new Date(Math.floor(process.uptime()) * 1000).toISOString().substr(11, 8);
     },
 
     onDeviceStatusChange: (callback) => {
