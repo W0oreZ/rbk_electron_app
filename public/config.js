@@ -1,3 +1,5 @@
+const { localStorage } = require('electron-browser-storage');
+
 const CONFIG_KEY = "cfg";
 
 const default_cfg = {

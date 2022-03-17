@@ -31,7 +31,7 @@ app.on('activate', () => {
 })
 
 async function main() {
-    device_port = await getDevicePort();
+    device_port = await getDevicePort(process.platform);
     if(device_port) {
         device_port.on('data', handleDeviceMessage);
     }
@@ -56,7 +56,7 @@ async function main() {
     );
 
     MainWindow.on('ready-to-show', async () => {
-        if(!device_port){
+        if(device_port){
             MainWindow.show()
         } else {
             const response = await dialog.showMessageBox(MainWindow, {
