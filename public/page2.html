@@ -2,20 +2,21 @@
 <html lang="en">
 <style>
     body {
-        background-image: url('Configuration2.png');
+      font-family: "Aileron",sans-serif;
+      background-image: url('Configuration2.png');
         background-repeat: no-repeat;
       }
     #defaultTemperature 
       {
         position: absolute;
-        left : 723px ;
+        left : 740px ;
         top : 184px;
         font-size: 28px; 
       }
       #CycleTime 
       {
         position: absolute;
-        left : 728px ;
+        left : 750px ;
         top : 281px;
         font-size: 28px; 
       }
@@ -73,11 +74,17 @@
             <button id="buttonApply"></button>
         </div>
         <div >
-            <button id="return"></button>
+            <button id="return" onclick="redirectReturn();"></button>
         </div>
         <div >
             <button id="CycleCount"></button>
         </div>
 
   </body>
+  <script>
+  function redirectReturn()
+  {
+    window.location.href = "file:///C:/Users/farhatOussama/Desktop/APTIVE/electron-react/device/rbk_electron_app/public/page1.html";
+  }
+</script>
 </html>
