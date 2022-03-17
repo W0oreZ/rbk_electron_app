@@ -5,12 +5,23 @@ const isDev = require('electron-is-dev')
 const { getDevicePort } = require('./port-utils.js');
 const { startTimer, getTimer } = require('./timer.js');
 const { loadConfig } = require('./config.js');
+const { mqtt_connect } = require('./mqttClient.js');
 let device_port = null;
 let MainWindow;
+let mqttCallbacks = [
+    {
+        topic: "devices/rbk/rpc",
+        handler: (bytes) => {
+            const data = bytes.toString();
+            console.log("Received : ", data)
+        }
+    }
+];
 
 app.disableHardwareAcceleration();
 app.whenReady().then(() => {
     loadConfig();
+    mqtt_connect('mqtt://test.mosquitto.org',mqttCallbacks)
     startTimer();
     main();
 });
