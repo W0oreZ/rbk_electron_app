@@ -93,7 +93,7 @@ async function main() {
         minimizable: false,
         maximizable: true,
         closable: true,
-        kiosk: false,
+        kiosk: true,
         width: 1024,
         height: 600,
         webPreferences: {
@@ -102,14 +102,14 @@ async function main() {
         }
     });
 
-    MainWindow.loadURL(
-        isDev?"http://localhost:3000":`file://${path.join(__dirname, "../build/index.html")}`
-    );
+    // MainWindow.loadURL(
+    //     isDev?"http://localhost:3000":`file://${path.join(__dirname, "../build/index.html")}`
+    // );
 
     MainWindow.on('ready-to-show', async () => {
         if(device_port){
             MainWindow.show()
-            MainWindow.webContents.openDevTools();
+            //MainWindow.webContents.openDevTools();
         } else {
             const response = await dialog.showMessageBox(MainWindow, {
                 title: 'DEVICE NOT FOUND',
@@ -122,7 +122,7 @@ async function main() {
         }
     })
 
-    //MainWindow.loadURL(`file://${path.join(__dirname, "../build/index.html")}`);
+    MainWindow.loadURL(`file://${path.join(__dirname, "../build/index.html")}`);
 
     
 }
