@@ -8,6 +8,12 @@ const RBK_API = {
         return os.platform();
     },
 
+    getStatus: async () => {
+        const state = await ipcRenderer.invoke('get-state');
+        return state;
+        //return new Date(Math.floor(process.uptime()) * 1000).toISOString().substr(11, 8);
+    },
+
     getRunTime: async () => {
         const time = await ipcRenderer.invoke('get-time');
         return new Date(Math.floor(time) * 1000).toISOString().substr(11, 8);

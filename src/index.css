@@ -125,6 +125,8 @@ body {
     font-family: "Aileron",sans-serif;
         
         font-weight: bold;
+        margin: 0;
+        padding: 0;
 
 }
 #dashboard {

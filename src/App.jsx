@@ -6,11 +6,13 @@ import MenuScreen from './pages/MenuScreen';
 import ConfigScreen from './pages/ConfigScreen';
 
 function App() {
+  //return datetime 
+  
   const [status, setStatus] = useState({
-    temperature: 500,
+    temperature: 0,
     count: 0,
-    countdown: 10,
-    display: "ON"
+    countdown: 0,
+    display: "OP IDLE"
   });
 
   const [timer, setTimer] = useState(null);
@@ -19,6 +21,16 @@ function App() {
   useEffect(()=> {
     setTimer(setInterval(async ()=>{
         setRunTime(await window.rbk.getRunTime());
+    },1000));
+
+    setTimer(setInterval(async ()=>{
+      const data = await window.rbk.getStatus();
+      setStatus(prev=>({
+        temperature:data.temperature,
+        count:data.count,
+        countdown:data.countdown,
+        display:prev.display
+      }))
     },1000));
 
     window.rbk.onDeviceStatusChange((data) => {

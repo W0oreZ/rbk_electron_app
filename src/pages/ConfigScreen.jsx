@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useHistory } from 'react-router-dom';
 
 const ConfigScreen = ({ temperature, countdown }) => {
+  const history = useHistory();
   const [t, setT] = useState(temperature);
   const [c, setC] = useState(countdown);
 
@@ -25,14 +26,14 @@ const ConfigScreen = ({ temperature, countdown }) => {
   
   }, [c])
   
-    const history = useHistory();
+    
 
   return (
     <div id="ConfigScreen">
          <div id="defaultTemperature">{t}</div>
         <div id="CycleTime">{c}</div>
         <div >
-            <button id="buttonApply" onClick={()=>window.rbk.sendCommand({type:"config", payload:{temp:t,countDown:c}})}></button>
+            <button id="buttonApply" onClick={()=>{window.rbk.sendCommand({type:"config", payload:{temp:t,countDown:c}});history.push("/")}}></button>
         </div>
         <div >
             <button id="return" onClick={()=>{history.push("/")}}></button>
@@ -53,7 +54,7 @@ const ConfigScreen = ({ temperature, countdown }) => {
         </div>
 
         <div >
-            <button id="reset" onClick={()=>window.rbk.sendCommand({type:"raz-count"})}></button>
+            <button id="reset" onClick={()=>{window.rbk.sendCommand({type:"raz-count"});history.push("/")}}></button>
         </div>
     </div>
   )
