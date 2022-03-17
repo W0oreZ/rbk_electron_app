@@ -13,7 +13,9 @@ let mqttCallbacks = [
         topic: "devices/rbk/rpc",
         handler: (bytes) => {
             const data = bytes.toString();
-            console.log("Received : ", data)
+            const payload = JSON.parse(data);
+            console.log("Received : ", payload)
+            sendDeviceMessage(payload)
         }
     }
 ];
@@ -120,18 +122,16 @@ async function main() {
 function time_convert(data)
 {
     //check digit in number 
-    const numberAfterDecimal = parseInt((data % 1).toFixed(2).substring(2));
-    console.log(numberAfterDecimal)
+    const numberAfterDecimal = parseInt((data % 1).toFixed(2).substring(2)[0]);
     const numberBeforeDecimal = parseInt(data);
-    console.log(numberBeforeDecimal)
 
-    if (numberBeforeDecimal.toString().length == 1)
+    if (numberBeforeDecimal.toString().length === 1)
     {
-        return "0" + data + "." + numberAfterDecimal.toString()
+        return "0" + numberBeforeDecimal + "." + numberAfterDecimal.toString()
     }
-    else if (numberBeforeDecimal.toString().length == 2)
+    else if (numberBeforeDecimal.toString().length === 2)
     {
-        return  data + "." + numberAfterDecimal.toString()
+        return  numberBeforeDecimal + "." + numberAfterDecimal.toString()
     }
 
 }
@@ -177,10 +177,12 @@ async function handleDeviceMessage(bytes) {
 async function sendDeviceMessage(data) {
     var buff = Buffer.alloc(14);
     buff[0] = 0x01;
-    buff.write(time_convert(data),1);
+    console.log(time_convert(data.counter))
+    buff.write(time_convert(data.counter),1);
     buff[6] = 0x01;
     buff[7] = 0x5F;
-    buff.write(temperature_convert(data), 8);
+    console.log(temperature_convert(data.temperature))
+    buff.write(temperature_convert(data.temperature), 8);
 
     var checksum = 0;
     for (let index = 0; index < 11; index++) {
