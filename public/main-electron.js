@@ -3,27 +3,54 @@ const path = require('path')
 const isDev = require('electron-is-dev')
 
 const { getDevicePort } = require('./port-utils.js');
-const { startTimer, getTimer } = require('./timer.js');
-const { loadConfig } = require('./config.js');
-const { mqtt_connect } = require('./mqttClient.js');
+const { startTimer, getTimer, pauseTimer, resumeTimer, resetTimer } = require('./timer.js');
+const { loadConfig, saveConfig } = require('./config.js');
+const { mqtt_connect, mqtt_publish } = require('./mqttClient.js');
+const { get_mac } = require('./platfome-utils.js');
 let device_port = null;
+var config = {
+    temperature: 500,
+    countdown: 5.5,
+    count: 0
+};
 let MainWindow;
 let mqttCallbacks = [
     {
-        topic: "devices/rbk/rpc",
+        topic: "devices/rbk01/rpc",
         handler: (bytes) => {
             const data = bytes.toString();
             const payload = JSON.parse(data);
             console.log("Received : ", payload)
-            sendDeviceMessage(payload)
+            // {type:"raz-count / raz-uptime",payload:}
+            // {type:"config", paylod:{temp:500,countDown:10}}
+            if(payload.type === "config") {
+                config.countdown = payload.payload.countDown;
+                config.temperature = payload.payload.temperature
+                var dd = {temperature: payload.payload.temp, countdown: payload.payload.countDown};
+                sendDeviceMessage(dd)
+                saveConfig(config)
+            }else if( payload.type === "raz-count" ) {
+                config.count = 0;
+                saveConfig(config)
+            }else if ( payload.type === "raz-uptime" ) {
+                resetTimer();
+            }
+            
         }
     }
 ];
 
+
+
 app.disableHardwareAcceleration();
-app.whenReady().then(() => {
-    loadConfig();
-    mqtt_connect('mqtt://test.mosquitto.org',mqttCallbacks)
+app.whenReady().then(async () => {
+
+    const clientID = get_mac()[0];
+    console.log("DeviceID: ", clientID)
+    //console.log(config)
+    config = await loadConfig();
+    console.log(config)
+    mqtt_connect('mqtt://197.230.172.211:2005', clientID, mqttCallbacks)
     startTimer();
     main();
 });
@@ -47,6 +74,16 @@ async function main() {
     device_port = await getDevicePort(process.platform);
     if(device_port) {
         device_port.on('data', handleDeviceMessage);
+        console.log(config)
+        sendDeviceMessage({temperature:config.temperature, countdown:config.countdown});
+        setInterval(()=>{
+            mqtt_publish("devices/rbk/events", JSON.stringify({
+                temperature: config.temperature,
+                countdown: config.countdown,
+                count: config.count,
+                uptime: getTimer()
+            }))
+        }, 5000)
     }
     
     MainWindow = new BrowserWindow({
@@ -55,7 +92,7 @@ async function main() {
         minimizable: false,
         maximizable: true,
         closable: true,
-        kiosk: true,
+        kiosk: false,
         width: 1024,
         height: 600,
         webPreferences: {
@@ -64,13 +101,14 @@ async function main() {
         }
     });
 
-    // MainWindow.loadURL(
-    //     isDev?"http://localhost:3000":`file://${path.join(__dirname, "../build/index.html")}`
-    // );
+    MainWindow.loadURL(
+        isDev?"http://localhost:3000":`file://${path.join(__dirname, "../build/index.html")}`
+    );
 
     MainWindow.on('ready-to-show', async () => {
         if(device_port){
             MainWindow.show()
+            MainWindow.webContents.openDevTools();
         } else {
             const response = await dialog.showMessageBox(MainWindow, {
                 title: 'DEVICE NOT FOUND',
@@ -83,7 +121,9 @@ async function main() {
         }
     })
 
-    MainWindow.loadURL(`file://${path.join(__dirname, "../build/index.html")}`);
+    //MainWindow.loadURL(`file://${path.join(__dirname, "../build/index.html")}`);
+
+    
 }
 
 // In this file you can include the rest of your app's specific main process
@@ -138,16 +178,16 @@ function temperature_convert(data)
 {
         //check digit in number 
         const number_of_digit = data.toString().length;
-        if (number_of_digit == 1)
+        if (number_of_digit === 1)
         {
             return "00" + data.toString()
         }
-        else if (number_of_digit == 2)
+        else if (number_of_digit === 2)
         {
             return "0" + data.toString()
 
         }
-        else if (number_of_digit == 3)
+        else if (number_of_digit === 3)
         {
             return data.toString()
 
@@ -159,24 +199,53 @@ async function handleDeviceMessage(bytes) {
 
     if(bytes[0] === 0x12) {
         console.log("OP START");
-        MainWindow.webContents.send('device-status', {'status': 'OP START'});
+        config.count++;
+        config.status = "OP START"
+        saveConfig(config);
+        MainWindow.webContents.send('device-status', config);
+        mqtt_publish("devices/rbk/events", JSON.stringify({
+            type: "STATUS",
+            payload: "OP START"
+        }))
+        resumeTimer();
         setTimeout(()=>{
             console.log("OP DONE");
-            MainWindow.webContents.send('device-status', {'status': 'OP DONE'});
-        },9500)
+            mqtt_publish("devices/rbk/events", JSON.stringify({
+                type: "STATUS",
+                payload: "OP DONE"
+            }))
+
+            config.status = "OP DONE";
+            saveConfig(config);
+
+            setTimeout(()=>{
+                config.status = "OP IDLE";
+                saveConfig(config);
+                MainWindow.webContents.send('device-status', config);
+            },1000)
+
+            MainWindow.webContents.send('device-status', config);
+        },config.countdown*1000)
     }
 
     if(bytes[0] === 0x00) {
         console.log("OP SHUTDOWN")
-        MainWindow.webContents.send('device-status', {'status': 'OP SHUTDOWN'});
+        config.status = "OP SHUTDOWN";
+        saveConfig(config);
+        MainWindow.webContents.send("device-status", {'status': 'OP SHUTDOWN'});
+        mqtt_publish("devices/rbk/events", JSON.stringify({
+            type: "STATUS",
+            payload: "OP SHUTDOWN"
+        }));
+        pauseTimer();
     }
 }
 
 async function sendDeviceMessage(data) {
     var buff = Buffer.alloc(14);
     buff[0] = 0x01;
-    console.log(time_convert(data.counter))
-    buff.write(time_convert(data.counter),1);
+    console.log(time_convert(data.countdown))
+    buff.write(time_convert(data.countdown),1);
     buff[6] = 0x01;
     buff[7] = 0x5F;
     console.log(temperature_convert(data.temperature))
@@ -186,13 +255,9 @@ async function sendDeviceMessage(data) {
     for (let index = 0; index < 11; index++) {
         checksum += buff[index];
     }
-    //checksum -= 2;
 
-    //buff.writeUint16BE(checksum, 11);
-    // buff.write(checksum.toString(16).charAt[1], 11);
-    // buff.write(checksum.toString(16).charAt[0], 12);
     var hex = checksum.toString(16);
-    console.log(hex)
+
     buff[11] = hex.charCodeAt(1);
     buff[12] = hex.charCodeAt(2);
     buff[13] = 0x04;
@@ -200,6 +265,8 @@ async function sendDeviceMessage(data) {
     console.log(buff);
     
     if(device_port) {
+        config.temperature = data.temperature;
+        config.countdown = data.countdown;
         device_port.write(buff);
     }
 }
@@ -208,4 +275,8 @@ ipcMain.on("send-command", sendDeviceMessage);
 
 ipcMain.handle('get-time', () => {
     return getTimer();
+})
+
+ipcMain.handle('get-state', () => {
+    return config;
 })

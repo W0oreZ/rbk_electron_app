@@ -1,8 +1,8 @@
 const mqtt = require('mqtt');
 let client = null;
 
-async function mqtt_connect(server, callbacks) {
-    client  = mqtt.connect(server)
+async function mqtt_connect(server, clientID, callbacks) {
+    client  = mqtt.connect(server,{clientId:clientID})
 
     client.on('connect', () => {
         callbacks.forEach(cb => {
@@ -26,18 +26,22 @@ async function mqtt_connect(server, callbacks) {
 }
 
 function mqtt_publish(topic, message) {
-    if(client) {
-        client.publish(topic, message, {}, (err) => {
-            if(!err) {
-                return true;
-            }else {
-                console.log("ERROR : "+ err.message);
-                return false;
-            }
-        })
-    }
-    else {
-        return false;
+    try {
+        if(client) {
+            client.publish(topic, message, {}, (err) => {
+                if(!err) {
+                    return true;
+                }else {
+                    console.log("ERROR : "+ err.message);
+                    return false;
+                }
+            })
+        }
+        else {
+            return false;
+        }
+    } catch (error) {
+        console.log("PUB ERROR : ", error.message)
     }
 }
 

@@ -1,24 +1,26 @@
-const { localStorage } = require('electron-browser-storage');
+const Store = require('electron-store');
+const store = new Store();
 
-const CONFIG_KEY = "cfg";
+const CONFIG_KEY = "rbk-config";
 
 const default_cfg = {
     temperature: 500,
-    countdown: 5.5
+    countdown: 5.5,
+    count: 0
 }
 
 async function loadConfig() {
-    if(localStorage.getItem(CONFIG_KEY)) {
-        return localStorage.getItem(CONFIG_KEY);
+    if(await store.get(CONFIG_KEY)) {
+        return JSON.parse(await store.get(CONFIG_KEY));
     } else {
         console.log("Using default configuration");
-        localStorage.setItem(default_cfg, JSON.stringify(default_cfg));
-        return localStorage.getItem(CONFIG_KEY);
+        await store.set(CONFIG_KEY, JSON.stringify(default_cfg));
+        return JSON.parse( await store.get(CONFIG_KEY));
     }
 }
 
 function saveConfig(config) {
-    localStorage.setItem(default_cfg, JSON.stringify(config));
+    store.set(CONFIG_KEY, JSON.stringify(config));
     return true;
 }
 
